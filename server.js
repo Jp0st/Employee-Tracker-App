@@ -1,14 +1,14 @@
 require('dotenv').config();
-const mysql = require('mysql12');
+const mysql = require('mysql2');
 const inquirer = require('inquirer');
 const { mainModule } = require('process');
 
 const db = mysql.createConnection(
     {
-        host: 'localhost',
-        user: 'root',
+        host: process.env.DB_HOST,
+        user: process.env.DB_USER,
         password: process.env.DB_PASSWORD,
-        database: 'employee_db',
+        database: process.env.DB_DATABASE,
     },
     console.log(`Connected to the employee_db database.`)
 );
@@ -137,27 +137,34 @@ const addDepartment = () => {
 };
 
 const addEmployee = () => {
-    let getMan =
-        'SELECT manager.id, first_name, last_name FROM employee WHERE manager_id IS NOT NULL';
-    let getRole =
-        'SELECT role.id, title FROM role';
+    let getMan = 'SELECT id, first_name, last_name FROM employee WHERE manager_id IS NOT NULL';
+    let getRole = 'SELECT role.id, title FROM role';
 
     const getManPromise = new Promise((resolve, reject) => {
         db.query(getMan, (err, rows) => {
             if (err) {
                 reject(err);
-            }; resolve(rows.map(({ manager_id, first_name, last_name }) =>
-                ({ name: `${first_name} ${last_name}`, value: manager_id })));
+            }
+
+            console.log('Rows from getMan query:', rows);
+
+            if (rows) {
+                resolve(rows.map(({ id, first_name, last_name }) => ({ name: `${first_name} ${last_name}`, value: id })));
+            } else {
+                resolve([]);
+            }
         });
     });
+
     const getRolePromise = new Promise((resolve, reject) => {
         db.query(getRole, (err, rows) => {
             if (err) {
                 reject(err);
-            }; resolve(rows.map(({ id, title }) =>
-                ({ name: title, value: id })));
+            }
+            resolve(rows.map(({ id, title }) => ({ name: title, value: id })));
         });
     });
+
     Promise.all([getManPromise, getRolePromise])
         .then(([managerChoices, roleChoices]) => {
             inquirer.prompt([
@@ -175,24 +182,24 @@ const addEmployee = () => {
                     type: 'list',
                     name: 'role',
                     message: 'What is the employee\'s role?',
-                    choices: roleChoices.map(choice => { return { name: choice.name, value: choice.id } }),
+                    choices: roleChoices,
                 },
                 {
                     type: 'list',
                     name: 'manager',
                     message: 'Who is the employee\'s manager?',
-                    choices: [...managerChoices.map(choice => { return { name: choice.name, value: choice.id } }), "None"],
+                    choices: [...managerChoices, { name: 'None', value: null }],
                 },
             ]).then((answer) => {
                 let sql = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)`;
-                let manager_id = answer.manager === "None" ? null : answer.manager;
+                let manager_id = answer.manager;
                 db.query(
                     sql,
                     [answer.first_name, answer.last_name, answer.role, manager_id],
                     (err, rows) => {
                         if (err) {
                             console.log(err);
-                        };
+                        }
                         console.log('Employee added!');
                         mainMenu();
                     }
@@ -201,6 +208,7 @@ const addEmployee = () => {
         })
         .catch(err => console.log(err));
 };
+
 
 const addRole = () => {
     db.query(`SELECT * FROM department`, (err, rows) => {
@@ -246,7 +254,7 @@ const addRole = () => {
     )
 };
 
-const editEmployeeRole = () => {
+const updateEmployeeRole = () => {
     const employeeList = 'SELECT employee.id, CONCAT(employee.first_name, " ", employee.last_name) AS employee FROM employee';
     const roleList = 'SELECT role.id, role.title FROM role';
 

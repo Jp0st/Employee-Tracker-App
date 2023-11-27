@@ -1,12 +1,11 @@
-INSERT INTO employee(first_name, last_name, role_id, manager_id)
-VALUES  ("Bob","Jones","1","2"),
-        ("Tom","Burnes","2","3"),
-        ("Denise", "McCardy","3","4"),
-        ("Peter","Pan","4","4"),
-        ("David", "Wolf", "2", "2"),
-        ("Paul", "Peterson", "1", null)
-        ("Stephanie","Simone","1","3");
+-- Inserting Departments
+INSERT INTO department(name)
+VALUES  ("Sales"),
+        ("Engineering"),
+        ("Finance"),
+        ("Legal");
 
+-- Inserting Roles
 INSERT INTO role(title, salary, department_id)
 VALUES  ("Sales Lead", 100000, 1),
         ("Salesperson", 80000, 1),
@@ -17,10 +16,17 @@ VALUES  ("Sales Lead", 100000, 1),
         ("Legal Team Lead", 250000, 4),
         ("Lawyer", 190000, 4);
 
-INSERT INTO department(name)
-VALUES  ("Sales"),
-        ("Engineering"),
-        ("Finance"),
-        ("Legal");
-```
+-- Inserting Employees (without manager_id)
+INSERT INTO employee(first_name, last_name, role_id, manager_id)
+VALUES  ("Bob", "Jones", "1", null),
+        ("Tom", "Burnes", "2", null),
+        ("Denise", "McCardy", "3", null),
+        ("Peter", "Pan", "4", null),
+        ("David", "Wolf", "1", null),
+        ("Paul", "Peterson", "5", null);
+
+-- Update manager_id values
+UPDATE employee SET manager_id = 2 WHERE first_name = "Bob";
+UPDATE employee SET manager_id = 3 WHERE first_name = "Tom";
+UPDATE employee SET manager_id = 5 WHERE first_name = "Denise" OR first_name = "Peter";
 
