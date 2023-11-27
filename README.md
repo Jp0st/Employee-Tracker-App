@@ -21,7 +21,9 @@ Once those are done you will quit mysql by typing 'quit' and path back into the 
 
 ## Usage
 
-To use the application all you need to do is follow the installation instructions, open your server.js integrated termainal, and run 'npm start' to begin the prompt window.  Attached is a video to show the usage of the application in entirety.
+To use the application all you need to do is follow the installation instructions, open your server.js integrated termainal, and run 'npm start' to begin the prompt window.  Attached is a video to show the usage of the application in entirety.\
+
+[Untitled_ Nov 27, 2023 3_23 PM.webm](https://github.com/Jp0st/Employee-Tracker-App/assets/108998647/eeb08093-d6d3-4830-a986-afa279d06441)
 
 ## Credits
 
